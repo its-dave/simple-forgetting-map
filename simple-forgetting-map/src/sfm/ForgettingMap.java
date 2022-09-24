@@ -8,18 +8,16 @@ import java.util.concurrent.ConcurrentHashMap;
  * When the map is added to beyond its maximum size, the least-used entry is removed
  */
 public class ForgettingMap<K,V> {
-    final int max;
-    final Map<K,V> map;
-    final Map<K,Integer> usageCountMap;
+    final int maxSize;
+    final Map<K,Value<V>> map;
 
     /**
      * Creates a new ForgettingMap
      * @param maxSize the maximum number of entries which can be added before the least-used entry is removed
      */
     public ForgettingMap(int maxSize) {
-        max = maxSize;
-        map = new ConcurrentHashMap<>(maxSize);
-        usageCountMap = new ConcurrentHashMap<>(maxSize);
+        this.maxSize = maxSize;
+        this.map = new ConcurrentHashMap<>(maxSize);
     }
 
     /**
@@ -29,11 +27,9 @@ public class ForgettingMap<K,V> {
      */
     public void add(K key, V value) {
         K leastUsed = getLeastUsedKey();
-        map.put(key, value);
-        usageCountMap.put(key, 0);
-        if (map.size() > max) {
+        map.put(key, new Value<>(value));
+        if (map.size() > maxSize) {
             map.remove(leastUsed);
-            usageCountMap.remove(leastUsed);
         }
     }
 
@@ -43,11 +39,12 @@ public class ForgettingMap<K,V> {
      * @return the value for the specified key
      */
     public V find(K key) {
-        V value = map.get(key);
+        Value<V> value = map.get(key);
         if (value != null) {
-            usageCountMap.put(key, usageCountMap.get(key) + 1);
+            value.incrementUseCount();
+            return value.getValue();
         }
-        return value;
+        return null;
     }
 
     /**
@@ -56,13 +53,35 @@ public class ForgettingMap<K,V> {
     K getLeastUsedKey() {
         K leastUsedKey = null;
         int lowestUsageCount = Integer.MAX_VALUE;
-        for (K key : usageCountMap.keySet()) {
-            Integer usageCount = usageCountMap.get(key);
+        for (K key : map.keySet()) {
+            Integer usageCount = map.get(key).getUseCount();
             if (usageCount < lowestUsageCount) {
                 leastUsedKey = key;
                 lowestUsageCount = usageCount;
             }
         }
         return leastUsedKey;
+    }
+}
+
+class Value<V> {
+    private final V value;
+    private int useCount;
+
+    Value(V value) {
+        this.value = value;
+        this.useCount = 0;
+    }
+
+    V getValue() {
+        return value;
+    }
+
+    void incrementUseCount() {
+        useCount++;
+    }
+
+    int getUseCount() {
+        return useCount;
     }
 }
