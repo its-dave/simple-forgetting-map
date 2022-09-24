@@ -8,9 +8,9 @@ import java.util.concurrent.ConcurrentHashMap;
  * When the map is added to beyond its maximum size, the least-used entry is removed
  */
 public class ForgettingMap<K,V> {
-    private final int max;
-    private final Map<K,V> map;
-    private final Map<K,Integer> usageCountMap;
+    final int max;
+    final Map<K,V> map;
+    final Map<K,Integer> usageCountMap;
 
     /**
      * Creates a new ForgettingMap
@@ -53,7 +53,7 @@ public class ForgettingMap<K,V> {
     /**
      * @return the key which has accessed the least number of times
      */
-    private K getLeastUsedKey() {
+    K getLeastUsedKey() {
         K leastUsedKey = null;
         int lowestUsageCount = Integer.MAX_VALUE;
         for (K key : usageCountMap.keySet()) {

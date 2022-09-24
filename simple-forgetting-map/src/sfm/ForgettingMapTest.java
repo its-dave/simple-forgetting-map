@@ -123,4 +123,106 @@ public class ForgettingMapTest {
 
         Assert.assertTrue("multi-theading has not actually been tested, use more threads", overlaps.get() > 1);
     }
+
+    @Test
+    public void testAddMethodAddsEntry() {
+        final Long TEST_KEY_1 = Long.valueOf(1);
+        final Long TEST_KEY_2 = Long.valueOf(2);
+        final Character TEST_VALUE_1 = 'a';
+        final Character TEST_VALUE_2 = 'b';
+
+        ForgettingMap<Long, Character> map = new ForgettingMap<>(1);
+
+        map.add(TEST_KEY_1, TEST_VALUE_1);
+        Assert.assertEquals(TEST_VALUE_1, map.map.get(TEST_KEY_1));
+        Assert.assertEquals(Integer.valueOf(0), map.usageCountMap.get(TEST_KEY_1));
+
+        map.add(TEST_KEY_2, TEST_VALUE_2);
+        Assert.assertEquals(TEST_VALUE_2, map.map.get(TEST_KEY_2));
+        Assert.assertEquals(Integer.valueOf(0), map.usageCountMap.get(TEST_KEY_2));
+    }
+
+    @Test
+    public void testAddMethodDoesNotExceedMaxSize() {
+        int maxSize = 1;
+        ForgettingMap<Short, Exception> map = new ForgettingMap<>(maxSize);
+        Assert.assertTrue("maximum size exceeded", map.map.size() <= maxSize);
+        Assert.assertTrue("maximum size exceeded", map.usageCountMap.size() <= maxSize);
+
+        map.add(Short.valueOf("1"), new InterruptedException());
+        Assert.assertTrue("maximum size exceeded", map.map.size() <= maxSize);
+        Assert.assertTrue("maximum size exceeded", map.usageCountMap.size() <= maxSize);
+
+        map.add(Short.valueOf("2"), new NullPointerException());
+        Assert.assertTrue("maximum size exceeded", map.map.size() <= maxSize);
+        Assert.assertTrue("maximum size exceeded", map.usageCountMap.size() <= maxSize);
+    }
+
+    @Test
+    public void testAddMethodRemovesLeastUsedKey() {
+        final Object TEST_KEY_1 = "key1";
+        final Object TEST_KEY_2 = '2';
+        final Object TEST_KEY_3 = 3;
+
+        ForgettingMap<Object, Boolean> map = new ForgettingMap<>(2);
+        map.map.put(TEST_KEY_1, true);
+        map.map.put(TEST_KEY_2, false);
+        map.usageCountMap.put(TEST_KEY_1, 1);
+        map.usageCountMap.put(TEST_KEY_2, 2);
+
+        map.add(TEST_KEY_3, false);
+        Assert.assertEquals(null, map.map.get(TEST_KEY_1));
+        Assert.assertEquals(null, map.usageCountMap.get(TEST_KEY_1));
+        Assert.assertNotNull(map.map.get(TEST_KEY_2));
+        Assert.assertNotNull(map.usageCountMap.get(TEST_KEY_2));
+        Assert.assertNotNull(map.map.get(TEST_KEY_3));
+        Assert.assertNotNull(map.usageCountMap.get(TEST_KEY_3));
+    }
+
+    @Test
+    public void testFindMethodReturnsValue() {
+        final String TEST_KEY_1 = "key1";
+        final String TEST_KEY_2 = "key2";
+        final Object TEST_VALUE_1 = true;
+        final Object TEST_VALUE_2 = "value";
+
+        ForgettingMap<String, Object> map = new ForgettingMap<>(2);
+        map.map.put(TEST_KEY_1, TEST_VALUE_1);
+        map.map.put(TEST_KEY_2, TEST_VALUE_2);
+        map.usageCountMap.put(TEST_KEY_1, 0);
+        map.usageCountMap.put(TEST_KEY_2, 0);
+
+        Assert.assertEquals(TEST_VALUE_1, map.find(TEST_KEY_1));
+        Assert.assertEquals(TEST_VALUE_2, map.find(TEST_KEY_2));
+        Assert.assertEquals(null, map.find("fake value"));
+    }
+
+    @Test
+    public void testFindMethodIncrementsUsageCount() {
+        final String TEST_KEY_1 = "key1";
+        
+        ForgettingMap<String, String> map = new ForgettingMap<>(1);
+        map.map.put(TEST_KEY_1, "value");
+        map.usageCountMap.put(TEST_KEY_1, 0);
+
+        map.find(TEST_KEY_1);
+        Assert.assertEquals(Integer.valueOf(1), map.usageCountMap.get(TEST_KEY_1));
+
+        map.find(TEST_KEY_1);
+        Assert.assertEquals(Integer.valueOf(2), map.usageCountMap.get(TEST_KEY_1));
+    }
+
+    @Test
+    public void testGetLeastUsedKeyMethod() {
+        final Object TEST_KEY_1 = 1;
+        final Object TEST_KEY_2 = '2';
+
+        ForgettingMap<Object, Object> map = new ForgettingMap<>(2);
+        map.map.put(TEST_KEY_1, true);
+        map.map.put(TEST_KEY_2, false);
+        map.usageCountMap.put(TEST_KEY_1, 1);
+        map.usageCountMap.put(TEST_KEY_2, 2);
+        
+        Assert.assertEquals(TEST_KEY_1, map.getLeastUsedKey());
+    }
 }
