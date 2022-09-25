@@ -1,5 +1,5 @@
 # simple-forgetting-map
-## A simple class to provide a key-value map which removes entries when increased beyond its maximum size
+## A simple class to provide a thread-safe key-value map which removes entries when increased beyond its maximum size
 Written in Java using minimal third-party libraries
 
 ### Usage
@@ -12,3 +12,8 @@ Written in Java using minimal third-party libraries
     - Updating an existing entry is considered to be creating a new entry, i.e. if the most-used entry is overwritten with the `add(key, value)` method then this new entry will now be the least-used entry
     - This behaviour is verified by the unit and functional tests
 - See JavaDoc for further detail
+
+### Extension Ideas
+- Implement the `Map` interface and its other methods
+- Add the option to toggle oldest/newest removal in the event of multiple least-used entries
+- Add the option to update a value without resetting the usage count
