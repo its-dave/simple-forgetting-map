@@ -135,6 +135,19 @@ public class ForgettingMapTest {
     }
 
     @Test
+    public void testAddMethodOverwritesExistingUsageCount() {
+        final String TEST_KEY_1 = "key1";
+
+        ForgettingMap<String, Float> map = new ForgettingMap<>(1);
+        Value<Float> testValue1 = new Value<>(1.2f);
+        testValue1.incrementUseCount();
+        map.map.put(TEST_KEY_1, testValue1);
+
+        map.add(TEST_KEY_1, 3.4f);
+        Assert.assertEquals(0, map.map.get(TEST_KEY_1).getUseCount());
+    }
+
+    @Test
     public void testFindMethodThreadSafety() {
         final Integer TEST_KEY_1 = 1;
 

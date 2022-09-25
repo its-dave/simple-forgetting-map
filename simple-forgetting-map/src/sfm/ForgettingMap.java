@@ -7,7 +7,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * ForgettingMap is a key-value map with a fixed maximum size
  * When the map is added to beyond its maximum size, the least-used entry is removed
  */
-public class ForgettingMap<K ,V> {
+public class ForgettingMap<K, V> {
     final int maxSize;
     final Map<K, Value<V>> map;
 
