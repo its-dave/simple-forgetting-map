@@ -25,7 +25,7 @@ public class ForgettingMap<K,V> {
      * @param key
      * @param value
      */
-    public void add(K key, V value) {
+    public synchronized void add(K key, V value) {
         K leastUsed = getLeastUsedKey();
         map.put(key, new Value<>(value));
         if (map.size() > maxSize) {
@@ -38,7 +38,7 @@ public class ForgettingMap<K,V> {
      * @param key
      * @return the value for the specified key
      */
-    public V find(K key) {
+    public synchronized V find(K key) {
         Value<V> value = map.get(key);
         if (value != null) {
             value.incrementUseCount();
