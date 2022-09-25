@@ -64,10 +64,10 @@ public class ForgettingMapTest {
             try {
                 int mapSize = future.get().intValue();
                 Assert.assertTrue("map size was " + mapSize + ", should only be " + MAX_SIZE + " or " + String.valueOf(MAX_SIZE + 1), mapSize == MAX_SIZE || mapSize == MAX_SIZE + 1);
-            } catch(InterruptedException e) {
+            } catch (InterruptedException e) {
                 e.printStackTrace();
                 Assert.fail("unexpected InterruptedException: " + e);
-            } catch(ExecutionException e) {
+            } catch (ExecutionException e) {
                 e.printStackTrace();
                 Assert.fail("unexpected ExecutionException: " + e);
             }
@@ -177,10 +177,10 @@ public class ForgettingMapTest {
         for (int i = 0; i < testThreadCount; i++) {
             try {
                 futures.get(i).get();
-            } catch(InterruptedException e) {
+            } catch (InterruptedException e) {
                 e.printStackTrace();
                 Assert.fail("unexpected InterruptedException: " + e);
-            } catch(ExecutionException e) {
+            } catch (ExecutionException e) {
                 e.printStackTrace();
                 Assert.fail("unexpected ExecutionException: " + e);
             }
@@ -211,7 +211,7 @@ public class ForgettingMapTest {
     @Test
     public void testFindMethodIncrementsUsageCount() {
         final String TEST_KEY_1 = "key1";
-        
+
         ForgettingMap<String, String> map = new ForgettingMap<>(1);
         map.map.put(TEST_KEY_1, new Value<>("value"));
 
@@ -235,7 +235,7 @@ public class ForgettingMapTest {
         testValue2.incrementUseCount();
         map.map.put(TEST_KEY_1, testValue1);
         map.map.put(TEST_KEY_2, testValue2);
-        
+
         Assert.assertEquals(TEST_KEY_1, map.getLeastUsedKey());
     }
 }
